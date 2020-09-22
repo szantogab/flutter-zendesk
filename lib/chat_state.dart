@@ -11,8 +11,8 @@ class ChatState {
 
   factory ChatState.fromMap(Map<dynamic, dynamic> map) {
     if (map == null) return null;
-    final agentMapList = map["agents"] as List<Map<dynamic, dynamic>>;
-    return ChatState(map["chatId"], map["chatComment"], map["chatSessionStatus"], map["chatRating"], map["isChatting"], map["queuePosition"], agentMapList.map((a) => Agent.fromMap(a)));
+    final agentMapList = map["agents"] as List<dynamic>;
+    return ChatState(map["chatId"], map["chatComment"], map["chatSessionStatus"], map["chatRating"], map["isChatting"], map["queuePosition"], agentMapList.map((a) => Agent.fromMap(a as Map<dynamic, dynamic>)));
   }
 }
 
