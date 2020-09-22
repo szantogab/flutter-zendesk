@@ -88,9 +88,9 @@ public class MethodCallHandlerImpl implements MethodCallHandler {
   }
 
   private void handleStartChat(MethodCall call, Result result) {
-    if (activity != null) {
-      MessagingActivity.builder().withEngines(ChatEngine.engine()).show(activity);
-    }
+    //if (activity != null) {
+      MessagingActivity.builder().withEngines(ChatEngine.engine()).show(context);
+    //}
 
     result.success(true);
   }
