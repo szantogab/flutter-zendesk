@@ -27,24 +27,22 @@ public class ZendeskPlugin implements FlutterPlugin, ActivityAware {
 
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
-    startListening(binding.getApplicationContext(), binding.getBinaryMessenger());
+    channel = new MethodChannel(binding.getBinaryMessenger(), "com.codeheadlabs.zendesk");
   }
 
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-    channel.setMethodCallHandler(null);
     channel = null;
   }
 
   private void startListening(Context applicationContext, BinaryMessenger messenger) {
     methodCallHandler = new MethodCallHandlerImpl(applicationContext);
-    channel = new MethodChannel(messenger, "com.codeheadlabs.zendesk");
-    channel.setMethodCallHandler(methodCallHandler);
   }
 
   @Override
   public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
     methodCallHandler.setActivity(binding.getActivity());
+    channel.setMethodCallHandler(methodCallHandler);
   }
 
   @Override
@@ -60,5 +58,6 @@ public class ZendeskPlugin implements FlutterPlugin, ActivityAware {
   @Override
   public void onDetachedFromActivity() {
     methodCallHandler.setActivity(null);
+    channel.setMethodCallHandler(null);
   }
 }
