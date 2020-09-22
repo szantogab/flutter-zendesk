@@ -23,24 +23,13 @@
 
 - (void) startListening:(id)listener emitter:(FlutterEventSink)emitter {
     // Prepare callback dictionary
-    NSLog(@"Start listening..");
-
-    
     if (self->listeners == nil) self->listeners = [NSMutableDictionary new];
-    
-    NSLog(@"Listeners inited..");
-
     
     // Get callback id
     NSString* currentListenerId =
         [[NSNumber numberWithUnsignedInteger:[((NSObject*) listener) hash]] stringValue];
     
-    NSLog(@"Listener ID calculated.");
-
-    
     ZDKObservationToken* token = [ZDKChat.instance.providers.chatProvider observeChatState:^(ZDKChatState * _Nonnull state) {
-        NSLog(@"Updating chat status..");
-        
         NSMutableDictionary* dict = [NSMutableDictionary new];
         [dict setValue:state.chatId forKey:@"chatId"];
         [dict setValue:state.comment forKey:@"chatComment"];
@@ -49,9 +38,20 @@
         [dict setValue:[NSNumber numberWithBool: state.isChatting] forKey:@"isChatting"];
         [dict setValue:[NSNumber numberWithLong: state.queuePosition.queue] forKey:@"queuePosition"];
         [dict setValue:[NSNumber numberWithLong: state.agents.count] forKey:@"agentCount"];
-        [dict setValue:[NSMutableArray new] forKey:@"agents"];
-        NSLog(@"Emitting new.....");
         
+        NSMutableArray* agents = [NSMutableArray new];
+        
+        if (state.agents) for (ZDKAgent* agent in state.agents) {
+            NSMutableDictionary* agentMap = [NSMutableDictionary new];
+            [agentMap setValue:agent.avatar.absoluteString forKey:@"avatarPath"];
+            [agentMap setValue:agent.displayName forKey:@"displayName"];
+            [agentMap setValue:agent.nick forKey:@"nick"];
+            [agentMap setValue: [NSNumber numberWithBool: agent.isTyping] forKey:@"isTyping"];
+            [agents addObject: agentMap];
+        }
+        
+        [dict setValue:agents forKey:@"agents"];
+
         emitter(dict);
     }];
     
