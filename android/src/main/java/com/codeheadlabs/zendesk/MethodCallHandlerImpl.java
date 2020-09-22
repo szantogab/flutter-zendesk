@@ -41,9 +41,6 @@ public class MethodCallHandlerImpl implements MethodCallHandler {
       case "startChat":
         handleStartChat(call, result);
         break;
-      case "observeChatState":
-        handleObserveChatState(call, result);
-        break;
       default:
         result.notImplemented();
         break;
