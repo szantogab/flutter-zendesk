@@ -24,6 +24,7 @@ public class ZendeskPlugin implements FlutterPlugin, ActivityAware {
     ZendeskPlugin plugin = new ZendeskPlugin();
     plugin.channel = new MethodChannel(registrar.messenger(), "com.codeheadlabs.zendesk");
     plugin.methodCallHandler = new MethodCallHandlerImpl(registrar.context());
+    plugin.methodCallHandler.setActivity(registrar.activity());
     plugin.channel.setMethodCallHandler(plugin.methodCallHandler);
   }
 
