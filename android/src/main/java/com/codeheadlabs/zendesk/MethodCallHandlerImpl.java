@@ -2,7 +2,6 @@ package com.codeheadlabs.zendesk;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.zendesk.service.ErrorResponse;
@@ -12,10 +11,7 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import zendesk.chat.*;
 import zendesk.chat.VisitorInfo.Builder;
-import zendesk.configurations.Configuration;
 import zendesk.messaging.MessagingActivity;
-
-import java.util.List;
 
 public class MethodCallHandlerImpl implements MethodCallHandler {
 
@@ -54,21 +50,14 @@ public class MethodCallHandlerImpl implements MethodCallHandler {
     Chat.INSTANCE.init(context, (String) call.argument("accountKey"));
     ChatProvider chatProvider = Chat.INSTANCE.providers().chatProvider();
     if (call.hasArgument("department")) {
-      chatProvider.setDepartment((String) call.argument("department"), new ZendeskCallback<Void>() {
-        @Override
-        public void onSuccess(Void unused) {
-          result.success(true);
-        }
-
-        @Override
-        public void onError(ErrorResponse errorResponse) {
-          result.error(errorResponse.getReason(), errorResponse.getResponseBody(), null);
-        }
-      });
+      chatProvider.setDepartment((String) call.argument("department"), null);
     }
+
     if (call.hasArgument("appName")) {
       //zopimConfig.visitorPathOne((String) call.argument("appName"));
     }
+
+    result.success(true);
   }
 
   private void handleSetVisitorInfo(MethodCall call, final Result result) {
