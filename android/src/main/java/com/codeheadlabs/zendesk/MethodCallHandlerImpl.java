@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.zendesk.service.ErrorResponse;
 import com.zendesk.service.ZendeskCallback;
+import io.flutter.Log;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
@@ -88,10 +89,13 @@ public class MethodCallHandlerImpl implements MethodCallHandler {
   }
 
   private void handleStartChat(MethodCall call, Result result) {
-    //if (activity != null) {
-      MessagingActivity.builder().withEngines(ChatEngine.engine()).show(context);
-    //}
-
-    result.success(true);
+    if (activity != null) {
+      Log.d("Zendesk", "Starting Zendesk Chat UI activity..");
+      MessagingActivity.builder().withEngines(ChatEngine.engine()).show(activity);
+      result.success(null);
+    } else {
+      Log.d("Zendesk", "Activity not attached so unable to show Zendesk Chat UI.");
+      result.success(false);
+    }
   }
 }
