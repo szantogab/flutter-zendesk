@@ -49,6 +49,7 @@
         [dict setValue:[NSNumber numberWithBool: state.isChatting] forKey:@"isChatting"];
         [dict setValue:[NSNumber numberWithLong: state.queuePosition.queue] forKey:@"queuePosition"];
         [dict setValue:[NSNumber numberWithLong: state.agents.count] forKey:@"agentCount"];
+        [dict setValue:[NSMutableArray new] forKey:@"agents"];
         NSLog(@"Emitting new.....");
         
         emitter(dict);

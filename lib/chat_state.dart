@@ -9,9 +9,9 @@ class ChatState {
 
   const ChatState(this.chatId, this.chatComment, this.chatSessionStatus, this.chatRating, this.isChatting, this.queuePosition, this.agents);
 
-  factory ChatState.fromMap(Map<String, dynamic> map) {
+  factory ChatState.fromMap(Map<dynamic, dynamic> map) {
     if (map == null) return null;
-    final agentMapList = map["agents"] as List<Map<String, dynamic>>;
+    final agentMapList = map["agents"] as List<Map<dynamic, dynamic>>;
     return ChatState(map["chatId"], map["chatComment"], map["chatSessionStatus"], map["chatRating"], map["isChatting"], map["queuePosition"], agentMapList.map((a) => Agent.fromMap(a)));
   }
 }
@@ -24,7 +24,7 @@ class Agent {
 
   const Agent(this.avatarPath, this.displayName, this.nick, this.isTyping);
 
-  factory Agent.fromMap(Map<String, dynamic> map) {
+  factory Agent.fromMap(Map<dynamic, dynamic> map) {
     if (map == null) return null;
     return Agent(map["avatarPath"], map["displayName"], map["nick"], map["isTyping"]);
   }
