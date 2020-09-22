@@ -22,21 +22,20 @@ public class ZendeskPlugin implements FlutterPlugin, ActivityAware {
 
   public static void registerWith(Registrar registrar) {
     ZendeskPlugin plugin = new ZendeskPlugin();
-    plugin.startListening(registrar.context(), registrar.messenger());
+    plugin.channel = new MethodChannel(registrar.messenger(), "com.codeheadlabs.zendesk");
+    plugin.methodCallHandler = new MethodCallHandlerImpl(registrar.context());
+    plugin.channel.setMethodCallHandler(plugin.methodCallHandler);
   }
 
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
     channel = new MethodChannel(binding.getBinaryMessenger(), "com.codeheadlabs.zendesk");
+    methodCallHandler = new MethodCallHandlerImpl(binding.getApplicationContext());
   }
 
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
     channel = null;
-  }
-
-  private void startListening(Context applicationContext, BinaryMessenger messenger) {
-    methodCallHandler = new MethodCallHandlerImpl(applicationContext);
   }
 
   @Override
