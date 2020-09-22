@@ -3,9 +3,11 @@ import 'dart:ui';
 
 import 'package:flutter/services.dart';
 
+import 'chat_state.dart';
+
 class Zendesk {
-  static const MethodChannel _channel =
-      const MethodChannel('com.codeheadlabs.zendesk');
+  static const MethodChannel _channel = const MethodChannel('com.codeheadlabs.zendesk');
+  static const EventChannel _chatStateEventChannel = const EventChannel('com.codeheadlabs.zendesk_chatStateChannel');
 
   Future<void> init(
     String accountKey, {
@@ -18,6 +20,8 @@ class Zendesk {
       'appName': appName,
     });
   }
+
+  Stream<ChatState> observeChatState() => _chatStateEventChannel.receiveBroadcastStream().map((e) => ChatState.fromMap(e));
 
   Future<void> setVisitorInfo({
     String name,
@@ -52,8 +56,7 @@ class Zendesk {
   }
 
   Future<List<String>> removeTags(List<String> tags) async {
-    return await _channel
-        .invokeListMethod<String>('removeTags', <String, dynamic>{
+    return await _channel.invokeListMethod<String>('removeTags', <String, dynamic>{
       'tags': tags,
     });
   }
