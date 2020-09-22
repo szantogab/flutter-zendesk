@@ -10,10 +10,12 @@ import com.zendesk.service.ZendeskCallback;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import zendesk.chat.Chat;
-import zendesk.chat.ProfileProvider;
-import zendesk.chat.VisitorInfo;
+import zendesk.chat.*;
 import zendesk.chat.VisitorInfo.Builder;
+import zendesk.configurations.Configuration;
+import zendesk.messaging.MessagingActivity;
+
+import java.util.List;
 
 public class MethodCallHandlerImpl implements MethodCallHandler {
 
@@ -48,16 +50,25 @@ public class MethodCallHandlerImpl implements MethodCallHandler {
     }
   }
 
-  private void handleInit(MethodCall call, Result result) {
+  private void handleInit(MethodCall call, final Result result) {
     Chat.INSTANCE.init(context, (String) call.argument("accountKey"));
+    ChatProvider chatProvider = Chat.INSTANCE.providers().chatProvider();
     if (call.hasArgument("department")) {
-      zopimConfig.department((String) call.argument("department"));
+      chatProvider.setDepartment((String) call.argument("department"), new ZendeskCallback<Void>() {
+        @Override
+        public void onSuccess(Void unused) {
+          result.success(true);
+        }
+
+        @Override
+        public void onError(ErrorResponse errorResponse) {
+          result.error(errorResponse.getReason(), errorResponse.getResponseBody(), null);
+        }
+      });
     }
     if (call.hasArgument("appName")) {
-      zopimConfig.visitorPathOne((String) call.argument("appName"));
+      //zopimConfig.visitorPathOne((String) call.argument("appName"));
     }
-
-    result.success(true);
   }
 
   private void handleSetVisitorInfo(MethodCall call, final Result result) {
@@ -89,8 +100,7 @@ public class MethodCallHandlerImpl implements MethodCallHandler {
 
   private void handleStartChat(MethodCall call, Result result) {
     if (activity != null) {
-      Intent intent = new Intent(activity, ZopimChatActivity.class);
-      activity.startActivity(intent);
+      MessagingActivity.builder().withEngines(ChatEngine.engine()).show(activity);
     }
 
     result.success(true);
