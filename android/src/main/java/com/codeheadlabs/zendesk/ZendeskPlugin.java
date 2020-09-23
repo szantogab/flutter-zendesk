@@ -2,7 +2,6 @@ package com.codeheadlabs.zendesk;
 
 import android.app.Activity;
 import android.content.Context;
-import androidx.annotation.NonNull;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
@@ -43,17 +42,17 @@ public class ZendeskPlugin implements FlutterPlugin, ActivityAware {
     }
 
     @Override
-    public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
+    public void onAttachedToEngine(FlutterPluginBinding binding) {
         startListening(binding.getBinaryMessenger(), binding.getApplicationContext(), null);
     }
 
     @Override
-    public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+    public void onDetachedFromEngine(FlutterPluginBinding binding) {
         channel = null;
     }
 
     @Override
-    public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
+    public void onAttachedToActivity(ActivityPluginBinding binding) {
         methodCallHandler.setActivity(binding.getActivity());
         channel.setMethodCallHandler(methodCallHandler);
         chatStateEventChannel.setStreamHandler(chatStateStreamHandler);
@@ -65,7 +64,7 @@ public class ZendeskPlugin implements FlutterPlugin, ActivityAware {
     }
 
     @Override
-    public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
+    public void onReattachedToActivityForConfigChanges(ActivityPluginBinding binding) {
         methodCallHandler.setActivity(binding.getActivity());
     }
 

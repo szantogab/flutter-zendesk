@@ -1,5 +1,6 @@
 package com.codeheadlabs.zendesk;
 
+import android.util.Log;
 import io.flutter.plugin.common.EventChannel;
 import zendesk.chat.*;
 
@@ -18,6 +19,7 @@ public class ChatStateStreamHandler implements EventChannel.StreamHandler {
         chatProvider.observeChatState(scope, new Observer<ChatState>() {
             @Override
             public void update(ChatState chatState) {
+                Log.d("Zendesk", "Updated chatState");
                 events.success(chatStateToMap(chatState));
             }
         });
@@ -26,6 +28,7 @@ public class ChatStateStreamHandler implements EventChannel.StreamHandler {
     @Override
     public void onCancel(Object arguments) {
         if (scope != null && !scope.isCancelled()) scope.cancel();
+        Log.d("Zendesk", "ChatState cancel observation.");
     }
 
     private static Map<String, Object> chatStateToMap(ChatState chatState) {
@@ -48,6 +51,8 @@ public class ChatStateStreamHandler implements EventChannel.StreamHandler {
         }
 
         map.put("agents", agents);
+
+        Log.d("Zendesk", "Converted chatstate to map.");
 
         return map;
     }
