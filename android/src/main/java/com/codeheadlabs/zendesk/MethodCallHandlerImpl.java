@@ -14,6 +14,8 @@ import zendesk.chat.*;
 import zendesk.chat.VisitorInfo.Builder;
 import zendesk.messaging.MessagingActivity;
 
+import java.util.Map;
+
 public class MethodCallHandlerImpl implements MethodCallHandler {
 
   public MethodCallHandlerImpl(Context context) {
@@ -41,6 +43,15 @@ public class MethodCallHandlerImpl implements MethodCallHandler {
       case "startChat":
         handleStartChat(call, result);
         break;
+      case "registerPushToken":
+        handleRegisterPushToken(call, result);
+        break;
+      case "unregisterPushToken":
+        handleUnregisterPushToken(call, result);
+        break;
+      case "processPush":
+        handleProcessPush(call, result);
+        break;
       default:
         result.notImplemented();
         break;
@@ -50,15 +61,49 @@ public class MethodCallHandlerImpl implements MethodCallHandler {
   private void handleInit(MethodCall call, final Result result) {
     Chat.INSTANCE.init(context, (String) call.argument("accountKey"));
     ChatProvider chatProvider = Chat.INSTANCE.providers().chatProvider();
+
     if (call.hasArgument("department")) {
       chatProvider.setDepartment((String) call.argument("department"), null);
     }
 
-    if (call.hasArgument("appName")) {
+    /*if (call.hasArgument("appName")) {
       //zopimConfig.visitorPathOne((String) call.argument("appName"));
-    }
+    }*/
 
     result.success(true);
+  }
+
+  private void handleRegisterPushToken(MethodCall call, final Result result) {
+    Chat.INSTANCE.providers().pushNotificationsProvider().registerPushToken((String) call.argument("token"), new ZendeskCallback<Void>() {
+      @Override
+      public void onSuccess(Void unused) {
+        result.success(null);
+      }
+
+      @Override
+      public void onError(ErrorResponse errorResponse) {
+        result.error(errorResponse.getReason(), errorResponse.getResponseBody(), null);
+      }
+    });
+  }
+
+  private void handleUnregisterPushToken(MethodCall call, final Result result) {
+    Chat.INSTANCE.providers().pushNotificationsProvider().unregisterPushToken(new ZendeskCallback<Void>() {
+      @Override
+      public void onSuccess(Void unused) {
+        result.success(null);
+      }
+
+      @Override
+      public void onError(ErrorResponse errorResponse) {
+        result.error(errorResponse.getReason(), errorResponse.getResponseBody(), null);
+      }
+    });
+  }
+
+  private void handleProcessPush(MethodCall call, final Result result) {
+    Chat.INSTANCE.providers().pushNotificationsProvider().processPushNotification((Map<String, String>) call.argument("remoteMessageData"));
+    result.success(null);
   }
 
   private void handleSetVisitorInfo(MethodCall call, final Result result) {

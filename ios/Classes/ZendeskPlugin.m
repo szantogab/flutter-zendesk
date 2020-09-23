@@ -88,6 +88,17 @@
                 result(res);
             }
         }];
+    } else if ([@"registerPushToken" isEqualToString:call.method]) {
+        NSString *token = call.arguments[@"token"];
+        [ZDKChat registerPushTokenString:token];
+        result(@(true));
+    } else if ([@"unregisterPushToken" isEqualToString:call.method]) {
+        [[ZDKChat pushNotificationsProvider] unregisterPushToken];
+        result(@(true));
+    } else if ([@"processPush" isEqualToString:call.method]) {
+        NSDictionary *remoteMessageData = call.arguments[@"remoteMessageData"];
+        [[ZDKChat pushNotificationsProvider] didReceiveRemoteNotification:remoteMessageData in: [UIApplication sharedApplication]];
+        result(@(true));
     } else if ([@"startChat" isEqualToString:call.method]) {
         NSNumber *navigationBarColor = call.arguments[@"iosNavigationBarColor"];
         NSNumber *navigationTitleColor = call.arguments[@"iosNavigationTitleColor"];
