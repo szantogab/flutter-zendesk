@@ -32,7 +32,7 @@
     ZDKObservationToken *token = [ZDKChat.instance.providers.accountProvider observeAccount:^(ZDKChatAccount *account) {
         NSMutableDictionary* dict = [NSMutableDictionary new];
         
-        [dict setValue:account.accountStatus == 1 ? @true : @false forKey:@"accountStatus"];
+        [dict setValue:account.accountStatus == 1 ? @true : @false forKey:@"online"];
         
         NSMutableArray* departments = [NSMutableArray new];
         
