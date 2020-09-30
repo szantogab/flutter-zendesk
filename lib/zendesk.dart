@@ -2,18 +2,21 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/services.dart';
-
+import 'account_state.dart';
 import 'chat_state.dart';
 
 class Zendesk {
   static const MethodChannel _channel = const MethodChannel('com.codeheadlabs.zendesk');
   static const EventChannel _chatStateEventChannel = const EventChannel('com.codeheadlabs.zendesk_chatStateChannel');
+  static const EventChannel _accountStateEventChannel = const EventChannel('com.codeheadlabs.zendesk_accountStateChannel');
 
   Future<void> init(String accountKey, {String department, String appName}) async {
     await _channel.invokeMethod<void>('init', <String, String>{'accountKey': accountKey, 'department': department, 'appName': appName});
   }
 
   Stream<ChatState> observeChatState() => _chatStateEventChannel.receiveBroadcastStream().map((e) => ChatState.fromMap(e));
+
+  Stream<AccountState> observeAccountState() => _accountStateEventChannel.receiveBroadcastStream().map((e) => AccountState.fromMap(e));
 
   Future<void> setVisitorInfo({String name, String email, String phoneNumber, String department}) async {
     await _channel.invokeMethod<void>('setVisitorInfo', <String, String>{'name': name, 'email': email, 'phoneNumber': phoneNumber, 'department': department});

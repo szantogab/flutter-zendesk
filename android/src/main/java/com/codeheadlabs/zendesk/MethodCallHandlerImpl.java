@@ -18,129 +18,144 @@ import java.util.Map;
 
 public class MethodCallHandlerImpl implements MethodCallHandler {
 
-  public MethodCallHandlerImpl(Context context) {
-    this.context = context;
-  }
-
-  private final Context context;
-
-  @Nullable
-  private Activity activity;
-
-  void setActivity(@Nullable Activity activity) {
-    this.activity = activity;
-  }
-
-  @Override
-  public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-    switch (call.method) {
-      case "init":
-        handleInit(call, result);
-        break;
-      case "setVisitorInfo":
-        handleSetVisitorInfo(call, result);
-        break;
-      case "startChat":
-        handleStartChat(call, result);
-        break;
-      case "registerPushToken":
-        handleRegisterPushToken(call, result);
-        break;
-      case "unregisterPushToken":
-        handleUnregisterPushToken(call, result);
-        break;
-      case "processPush":
-        handleProcessPush(call, result);
-        break;
-      default:
-        result.notImplemented();
-        break;
+    public MethodCallHandlerImpl(Context context) {
+        this.context = context;
     }
-  }
 
-  private void handleInit(MethodCall call, final Result result) {
-    Chat.INSTANCE.init(context, (String) call.argument("accountKey"));
-    ChatProvider chatProvider = Chat.INSTANCE.providers().chatProvider();
+    private final Context context;
 
-    if (call.hasArgument("department")) {
-      chatProvider.setDepartment((String) call.argument("department"), null);
+    @Nullable
+    private Activity activity;
+
+    void setActivity(@Nullable Activity activity) {
+        this.activity = activity;
     }
+
+    @Override
+    public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
+        switch (call.method) {
+            case "init":
+                handleInit(call, result);
+                break;
+            case "setVisitorInfo":
+                handleSetVisitorInfo(call, result);
+                break;
+            case "startChat":
+                handleStartChat(call, result);
+                break;
+            case "registerPushToken":
+                handleRegisterPushToken(call, result);
+                break;
+            case "unregisterPushToken":
+                handleUnregisterPushToken(call, result);
+                break;
+            case "processPush":
+                handleProcessPush(call, result);
+                break;
+            default:
+                result.notImplemented();
+                break;
+        }
+    }
+
+    private void handleInit(MethodCall call, final Result result) {
+        Chat.INSTANCE.init(context, (String) call.argument("accountKey"));
+        ChatProvider chatProvider = Chat.INSTANCE.providers().chatProvider();
+
+        if (call.hasArgument("department")) {
+            chatProvider.setDepartment((String) call.argument("department"), null);
+        }
 
     /*if (call.hasArgument("appName")) {
       //zopimConfig.visitorPathOne((String) call.argument("appName"));
     }*/
 
-    result.success(true);
-  }
+        result.success(true);
+    }
 
-  private void handleRegisterPushToken(MethodCall call, final Result result) {
-    Chat.INSTANCE.providers().pushNotificationsProvider().registerPushToken((String) call.argument("token"), new ZendeskCallback<Void>() {
-      @Override
-      public void onSuccess(Void unused) {
+    private void handleRegisterPushToken(MethodCall call, final Result result) {
+        Chat.INSTANCE.providers().pushNotificationsProvider().registerPushToken((String) call.argument("token"), new ZendeskCallback<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                result.success(null);
+            }
+
+            @Override
+            public void onError(ErrorResponse errorResponse) {
+                result.error(errorResponse.getReason(), errorResponse.getResponseBody(), null);
+            }
+        });
+    }
+
+    private void handleUnregisterPushToken(MethodCall call, final Result result) {
+        Chat.INSTANCE.providers().pushNotificationsProvider().unregisterPushToken(new ZendeskCallback<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                result.success(null);
+            }
+
+            @Override
+            public void onError(ErrorResponse errorResponse) {
+                result.error(errorResponse.getReason(), errorResponse.getResponseBody(), null);
+            }
+        });
+    }
+
+    private void handleProcessPush(MethodCall call, final Result result) {
+        Chat.INSTANCE.providers().pushNotificationsProvider().processPushNotification((Map<String, String>) call.argument("remoteMessageData"));
         result.success(null);
-      }
-
-      @Override
-      public void onError(ErrorResponse errorResponse) {
-        result.error(errorResponse.getReason(), errorResponse.getResponseBody(), null);
-      }
-    });
-  }
-
-  private void handleUnregisterPushToken(MethodCall call, final Result result) {
-    Chat.INSTANCE.providers().pushNotificationsProvider().unregisterPushToken(new ZendeskCallback<Void>() {
-      @Override
-      public void onSuccess(Void unused) {
-        result.success(null);
-      }
-
-      @Override
-      public void onError(ErrorResponse errorResponse) {
-        result.error(errorResponse.getReason(), errorResponse.getResponseBody(), null);
-      }
-    });
-  }
-
-  private void handleProcessPush(MethodCall call, final Result result) {
-    Chat.INSTANCE.providers().pushNotificationsProvider().processPushNotification((Map<String, String>) call.argument("remoteMessageData"));
-    result.success(null);
-  }
-
-  private void handleSetVisitorInfo(MethodCall call, final Result result) {
-    ProfileProvider profileProvider = Chat.INSTANCE.providers().profileProvider();
-
-    Builder builder = VisitorInfo.builder();
-    if (call.hasArgument("name")) {
-      builder = builder.withName((String) call.argument("name"));
-    }
-    if (call.hasArgument("email")) {
-      builder = builder.withEmail((String) call.argument("email"));
-    }
-    if (call.hasArgument("phoneNumber")) {
-      builder = builder.withPhoneNumber((String) call.argument("phoneNumber"));
     }
 
-    profileProvider.setVisitorInfo(builder.build(), new ZendeskCallback<Void>() {
-      @Override
-      public void onSuccess(Void aVoid) {
-        result.success(null);
-      }
+    private void handleSetVisitorInfo(MethodCall call, final Result result) {
+        ProfileProvider profileProvider = Chat.INSTANCE.providers().profileProvider();
 
-      @Override
-      public void onError(ErrorResponse errorResponse) {
-        result.error(errorResponse.getReason(), errorResponse.getResponseBody(), null);
-      }
-    });
-  }
+        Builder builder = VisitorInfo.builder();
+        if (call.hasArgument("name")) {
+            builder = builder.withName((String) call.argument("name"));
+        }
+        if (call.hasArgument("email")) {
+            builder = builder.withEmail((String) call.argument("email"));
+        }
+        if (call.hasArgument("phoneNumber")) {
+            builder = builder.withPhoneNumber((String) call.argument("phoneNumber"));
+        }
 
-  private void handleStartChat(MethodCall call, Result result) {
-    if (activity != null) {
-      Log.d("Zendesk", "Starting Zendesk Chat UI activity..");
-      MessagingActivity.builder().withEngines(ChatEngine.engine()).show(activity);
-      result.success(null);
-    } else {
-      Log.d("Zendesk", "Activity not attached so unable to show Zendesk Chat UI.");
-      result.success(false);
+        profileProvider.setVisitorInfo(builder.build(), new ZendeskCallback<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                result.success(null);
+            }
+
+            @Override
+            public void onError(ErrorResponse errorResponse) {
+                result.error(errorResponse.getReason(), errorResponse.getResponseBody(), null);
+            }
+        });
     }
-  }
+
+    private void handleStartChat(MethodCall call, Result result) {
+        if (activity != null) {
+            //NSNumber *navigationBarColor = call.arguments[@"iosNavigationBarColor"];
+            //NSNumber *navigationTitleColor = call.arguments[@"iosNavigationTitleColor"];
+            //NSString *backButtonTitle = [self null:call.arguments[@"iosBackButtonTitle"] or:NSLocalizedString(@"Back", "")];
+            //NSString *messagingName = [self null:call.arguments[@"name"] or:@"Chat Bot"];
+
+            Boolean isPreChatFormEnabled = call.argument("isPreChatFormEnabled");
+            Boolean isOfflineFormEnabled = call.argument("isOfflineFormEnabled");
+            Boolean isAgentAvailabilityEnabled = call.argument("isAgentAvailabilityEnabled");
+            Boolean isChatTranscriptPromptEnabled = call.argument("isChatTranscriptPromptEnabled");
+
+            ChatConfiguration chatConfiguration = ChatConfiguration.builder()
+                    .withPreChatFormEnabled(isPreChatFormEnabled != null ? isPreChatFormEnabled : true)
+                    .withOfflineFormEnabled(isOfflineFormEnabled != null ? isOfflineFormEnabled : true)
+                    .withAgentAvailabilityEnabled(isAgentAvailabilityEnabled != null ? isAgentAvailabilityEnabled : true)
+                    .withTranscriptEnabled(isChatTranscriptPromptEnabled != null ? isChatTranscriptPromptEnabled : true)
+                    .build();
+
+            MessagingActivity.builder().withEngines(ChatEngine.engine()).show(activity, chatConfiguration);
+            result.success(true);
+        } else {
+            result.success(false);
+        }
+    }
 }

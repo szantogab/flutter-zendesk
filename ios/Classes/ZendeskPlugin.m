@@ -1,5 +1,6 @@
 #import "ZendeskPlugin.h"
 #import "ChatStateStreamHandler.h"
+#import "AccountStateStreamHandler.h"
 
 #import <ChatSDK/ChatSDK.h>
 #import <MessagingSDK/MessagingSDK.h>
@@ -14,8 +15,11 @@
       methodChannelWithName:@"com.codeheadlabs.zendesk"
             binaryMessenger:[registrar messenger]];
     
-    FlutterEventChannel* chatStateEventChannel = [FlutterEventChannel eventChannelWithName:@"com.codeheadlabs.zendesk_chatStateChannel" binaryMessenger:[registrar messenger]];
-    [chatStateEventChannel setStreamHandler: [[ChatStateStreamHandler alloc] init]];
+  FlutterEventChannel* chatStateEventChannel = [FlutterEventChannel eventChannelWithName:@"com.codeheadlabs.zendesk_chatStateChannel" binaryMessenger:[registrar messenger]];
+  [chatStateEventChannel setStreamHandler: [[ChatStateStreamHandler alloc] init]];
+
+  FlutterEventChannel* accountStateEventChannel = [FlutterEventChannel eventChannelWithName:@"com.codeheadlabs.zendesk_accountStateChannel" binaryMessenger:[registrar messenger]];
+  [accountStateEventChannel setStreamHandler: [[AccountStateStreamHandler alloc] init]];
 
   ZendeskPlugin* instance = [[ZendeskPlugin alloc] init];
   [registrar addMethodCallDelegate:instance channel:channel];
