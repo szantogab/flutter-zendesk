@@ -27,7 +27,7 @@ public class AccountStateStreamHandler implements EventChannel.StreamHandler {
 
     @Override
     public void onCancel(Object arguments) {
-    //    if (scope != null && !scope.isCancelled()) scope.cancel();
+        if (scope != null && !scope.isCancelled()) scope.cancel();
         Log.d("Zendesk", "AccountState cancel observation.");
     }
 
